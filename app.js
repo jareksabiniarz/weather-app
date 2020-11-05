@@ -1,11 +1,30 @@
-const request = require('postman-request')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
-const url = 'http://api.weatherstack.com/current?access_key=8fdeaab20c2d5d7cfca8abc683d27064&query=52.042009,23.100170&units=s'
 
-request({url: url, json: true}, (error, response) => {         //first url is option/property name, second one is variable name, first argument of request is object
-      //const data =JSON.parse(response.body)        //callback func has two arguments for two events
-      //console.log(data.current)
-      //console.log(response.body.current)
+const place = process.argv[2]
 
-      console.log(response.body.current.weather_descriptions[0] + ' There is ' + response.body.current.temperature + ' Kelwins right now, it feels like ' + response.body.current.feelslike)
-})                 
+if (!place) {
+      return console.log('Give the place!')
+}
+
+geocode(place, (error, { latitude, longitude, location } = {}) => {           // callback has two arguments typically, one is always undefined
+
+      if (error) {
+            return console.log(error)                 //return stops executing the program if error occures
+      }
+      // console.log('Error: ', error)
+      // console.log('Data: ', data)
+      forecast(latitude, longitude, (error, forecastData) => {
+            if (error) {
+                  return console.log(error)
+            }
+
+            // console.log('Error', error)
+            // console.log('Data', data)
+
+            console.log(location)
+            console.log(forecastData)
+          })
+})
+
